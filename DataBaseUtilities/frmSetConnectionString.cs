@@ -21,6 +21,7 @@ namespace DataBaseUtilities
                 _source = source;
                 var cn = new SqlConnection(connectionString);
                 dbName = cn.Database;
+                rbtnCreate.Checked = true;
             }
             catch (Exception ex)
             {
@@ -53,19 +54,10 @@ namespace DataBaseUtilities
         {
             try
             {
-                var frm = new FRMSetSqlEngine();
-                frm.ShowDialog(this);
-
-                if (!string.IsNullOrEmpty(Txt_PathConnection.Text))
-                {
-                    var cn = new SqlConnectionStringBuilder(Txt_PathConnection.Text);
-                    var newCn = new SqlConnection(Settings.ServerConnectionsString);
-                    cn.DataSource = newCn.DataSource;
-                    Txt_PathConnection.Text = cn.ConnectionString;
-                    return;
-                }
-
-                Txt_PathConnection.Text = Settings.ServerConnectionsString;
+                var frm = new FRMInitialSettings();
+                if (frm.ShowDialog(this) != DialogResult.OK) return;
+                connectionString = frm.ConnectionString;
+                Txt_PathConnection.Text = frm.ConnectionString;
             }
             catch (Exception ex)
             {
@@ -89,34 +81,39 @@ namespace DataBaseUtilities
                     connectionString = Txt_PathConnection.Text;
                 if (rbtnCreate.Checked)
                 {
-                    if (string.IsNullOrEmpty(Txt_DatabaseName.Text))
+                    if (string.IsNullOrEmpty(connectionString))
                     {
-                        er.SetError(Txt_DatabaseName, "نام بانک اطلاعاتی را وارد نمایید");
-                        return;
-                    }
-                    var res = DataBase.CreateDatabase(Txt_DatabaseName.Text,
-                        connectionString);
-
-
-                    if (res.Result.HasError)
-                    {
-                        for (var i = 1; i < 20; i++)
+                        if (string.IsNullOrEmpty(Txt_DatabaseName.Text))
                         {
-                            var dbName = Txt_DatabaseName.Text + i;
-                            res = DataBase.CreateDatabase(dbName, Txt_PathConnection.Text);
-                            if (res.Result.HasError) continue;
-                            Txt_DatabaseName.Text = dbName;
-                            break;
+                            er.SetError(Txt_DatabaseName, "نام بانک اطلاعاتی را وارد نمایید");
+                            return;
                         }
+
+                        var res = DataBase.CreateDatabase(Txt_DatabaseName.Text,
+                            connectionString);
+
 
                         if (res.Result.HasError)
                         {
-                            return;
-                        }
-                    }
+                            for (var i = 1; i < 20; i++)
+                            {
+                                var dbName = Txt_DatabaseName.Text + i;
+                                res = DataBase.CreateDatabase(dbName, Txt_PathConnection.Text);
+                                if (res.Result.HasError) continue;
+                                Txt_DatabaseName.Text = dbName;
+                                break;
+                            }
 
-                    var cn = new SqlConnectionStringBuilder(connectionString) { InitialCatalog = Txt_DatabaseName.Text };
-                    connectionString = cn.ConnectionString;
+                            if (res.Result.HasError)
+                            {
+                                return;
+                            }
+                        }
+
+                        var cn = new SqlConnectionStringBuilder(connectionString)
+                            {InitialCatalog = Txt_DatabaseName.Text};
+                        connectionString = cn.ConnectionString;
+                    }
                 }
 
 
@@ -147,10 +144,19 @@ namespace DataBaseUtilities
         {
             try
             {
-                var frm = new FRMInitialSettings();
-                if (frm.ShowDialog(this) != DialogResult.OK) return;
-                connectionString = frm.ConnectionString;
-                Txt_PathConnection.Text = frm.ConnectionString;
+                var frm = new FRMSetSqlEngine();
+                frm.ShowDialog(this);
+
+                if (!string.IsNullOrEmpty(Txt_PathConnection.Text))
+                {
+                    var cn = new SqlConnectionStringBuilder(Txt_PathConnection.Text);
+                    var newCn = new SqlConnection(Settings.ServerConnectionsString);
+                    cn.DataSource = newCn.DataSource;
+                    Txt_PathConnection.Text = cn.ConnectionString;
+                    return;
+                }
+
+                Txt_PathConnection.Text = Settings.ServerConnectionsString;
             }
             catch (Exception ex)
             {
@@ -166,7 +172,7 @@ namespace DataBaseUtilities
                 grpNetwork.Visible = false;
                 GroupBox1.Visible = true;
                 Txt_PathConnection.Text = "";
-                this.Size = new Size(420, 471);
+                this.Size = new Size(420, 316);
             }
             catch (Exception ex)
             {
@@ -181,7 +187,7 @@ namespace DataBaseUtilities
                 if (!rbtnNetwork.Checked) return;
                 grpNetwork.Visible = true;
                 GroupBox1.Visible = false;
-                this.Size = new Size(420, 339);
+                this.Size = new Size(420, 189);
             }
             catch (Exception ex)
             {

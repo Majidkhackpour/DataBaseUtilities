@@ -139,11 +139,11 @@
             // Label1
             // 
             this.Label1.AutoSize = true;
-            this.Label1.Font = new System.Drawing.Font("Tahoma", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Label1.Font = new System.Drawing.Font("B Titr", 9.75F, System.Drawing.FontStyle.Bold);
             this.Label1.ForeColor = System.Drawing.Color.Black;
             this.Label1.Location = new System.Drawing.Point(276, 30);
             this.Label1.Name = "Label1";
-            this.Label1.Size = new System.Drawing.Size(123, 16);
+            this.Label1.Size = new System.Drawing.Size(101, 23);
             this.Label1.TabIndex = 3;
             this.Label1.Text = "نام بانک اطلاعاتی :";
             // 

@@ -86,13 +86,15 @@ namespace DataBaseUtilities
                     MessageBoxIcon.Information, MessageBoxDefaultButton.Button1, MessageBoxOptions.RightAlign);
                 return;
             }
+
+            CreateCN();
             var cn = TextBox1.Text;
             try
             {
                 var sqlcn = new System.Data.SqlClient.SqlConnection(TextBox1.Text);
                 sqlcn.Open();
                 sqlcn.Close();
-                ConnectionString = TextBox1.Text;
+                ConnectionString = sqlcn.ConnectionString;
                 DialogResult = DialogResult.OK;
                 Close();
             }

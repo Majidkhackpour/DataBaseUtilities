@@ -30,14 +30,14 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FRMSetSqlEngine));
             this.grp = new DevComponents.DotNetBar.PanelEx();
-            this.label1 = new System.Windows.Forms.Label();
-            this.TxtServerName = new System.Windows.Forms.TextBox();
+            this.RBWindowsDetect = new System.Windows.Forms.RadioButton();
+            this.RBSqlServerDetect = new System.Windows.Forms.RadioButton();
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.TxtPassword = new System.Windows.Forms.TextBox();
             this.TxtUserName = new System.Windows.Forms.TextBox();
-            this.RBWindowsDetect = new System.Windows.Forms.RadioButton();
-            this.RBSqlServerDetect = new System.Windows.Forms.RadioButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.TxtServerName = new System.Windows.Forms.TextBox();
             this.btnFinish = new DevComponents.DotNetBar.ButtonX();
             this.btnCancel = new DevComponents.DotNetBar.ButtonX();
             this.btnTest = new DevComponents.DotNetBar.ButtonX();
@@ -71,64 +71,6 @@
             this.grp.Style.GradientAngle = 90;
             this.grp.TabIndex = 0;
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.label1.Location = new System.Drawing.Point(291, 24);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(63, 26);
-            this.label1.TabIndex = 14;
-            this.label1.Text = "نام سرور:";
-            // 
-            // TxtServerName
-            // 
-            this.TxtServerName.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.TxtServerName.Location = new System.Drawing.Point(24, 24);
-            this.TxtServerName.Name = "TxtServerName";
-            this.TxtServerName.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.TxtServerName.Size = new System.Drawing.Size(259, 31);
-            this.TxtServerName.TabIndex = 0;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.label3.Location = new System.Drawing.Point(294, 183);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(69, 26);
-            this.label3.TabIndex = 18;
-            this.label3.Text = "رمز عبور : ";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.label2.Location = new System.Drawing.Point(294, 143);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(75, 26);
-            this.label2.TabIndex = 17;
-            this.label2.Text = "نام کاربری :";
-            // 
-            // TxtPassword
-            // 
-            this.TxtPassword.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.TxtPassword.Location = new System.Drawing.Point(24, 184);
-            this.TxtPassword.Name = "TxtPassword";
-            this.TxtPassword.PasswordChar = '*';
-            this.TxtPassword.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.TxtPassword.Size = new System.Drawing.Size(259, 31);
-            this.TxtPassword.TabIndex = 4;
-            // 
-            // TxtUserName
-            // 
-            this.TxtUserName.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
-            this.TxtUserName.Location = new System.Drawing.Point(24, 141);
-            this.TxtUserName.Name = "TxtUserName";
-            this.TxtUserName.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.TxtUserName.Size = new System.Drawing.Size(259, 31);
-            this.TxtUserName.TabIndex = 3;
-            // 
             // RBWindowsDetect
             // 
             this.RBWindowsDetect.AutoSize = true;
@@ -153,6 +95,64 @@
             this.RBSqlServerDetect.Text = "احراز هویت توسط SQL";
             this.RBSqlServerDetect.UseVisualStyleBackColor = true;
             this.RBSqlServerDetect.CheckedChanged += new System.EventHandler(this.RBSqlServerDetect_CheckedChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.label3.Location = new System.Drawing.Point(282, 184);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(69, 26);
+            this.label3.TabIndex = 18;
+            this.label3.Text = "رمز عبور : ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.label2.Location = new System.Drawing.Point(282, 144);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(75, 26);
+            this.label2.TabIndex = 17;
+            this.label2.Text = "نام کاربری :";
+            // 
+            // TxtPassword
+            // 
+            this.TxtPassword.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.TxtPassword.Location = new System.Drawing.Point(24, 184);
+            this.TxtPassword.Name = "TxtPassword";
+            this.TxtPassword.PasswordChar = '*';
+            this.TxtPassword.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.TxtPassword.Size = new System.Drawing.Size(259, 31);
+            this.TxtPassword.TabIndex = 4;
+            // 
+            // TxtUserName
+            // 
+            this.TxtUserName.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.TxtUserName.Location = new System.Drawing.Point(24, 141);
+            this.TxtUserName.Name = "TxtUserName";
+            this.TxtUserName.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.TxtUserName.Size = new System.Drawing.Size(259, 31);
+            this.TxtUserName.TabIndex = 3;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.label1.Location = new System.Drawing.Point(291, 24);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(63, 26);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "نام سرور:";
+            // 
+            // TxtServerName
+            // 
+            this.TxtServerName.Font = new System.Drawing.Font("B Nazanin", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(178)));
+            this.TxtServerName.Location = new System.Drawing.Point(24, 24);
+            this.TxtServerName.Name = "TxtServerName";
+            this.TxtServerName.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.TxtServerName.Size = new System.Drawing.Size(259, 31);
+            this.TxtServerName.TabIndex = 0;
             // 
             // btnFinish
             // 
