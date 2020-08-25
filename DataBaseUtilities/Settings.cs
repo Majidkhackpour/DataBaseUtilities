@@ -1,9 +1,9 @@
 ﻿using System;
 using Services;
 
-namespace BackUpDLL
+namespace DataBaseUtilities
 {
-    public class DataBaseUtilities
+    public class Settings
     {
         public static string ConnectionString = "";
         private static string _ServerConnectionsString;

@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Net;
+using Microsoft.SqlServer.Management.Smo.Wmi;
 using Services;
+using ServiceState = Services.ServiceState;
 
 namespace DataBaseUtilities
 {

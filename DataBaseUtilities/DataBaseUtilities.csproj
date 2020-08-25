@@ -251,6 +251,18 @@
     <Compile Include="DataBase.cs" />
     <Compile Include="DatabaseAction.cs" />
     <Compile Include="DataBaseBackUpInfo.cs" />
+    <Compile Include="FRMInitialSettings.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FRMInitialSettings.Designer.cs">
+      <DependentUpon>FRMInitialSettings.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmSetConnectionString.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmSetConnectionString.Designer.cs">
+      <DependentUpon>frmSetConnectionString.cs</DependentUpon>
+    </Compile>
     <Compile Include="FRMSetSqlEngine.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -274,6 +286,17 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="FRMInitialSettings.resx">
+      <DependentUpon>FRMInitialSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmSetConnectionString.resx">
+      <DependentUpon>frmSetConnectionString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FRMSetSqlEngine.resx">
+      <DependentUpon>FRMSetSqlEngine.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Data.SqlClient.SNI.2.0.0\build\net46\Microsoft.Data.SqlClient.SNI.targets" Condition="Exists('..\packages\Microsoft.Data.SqlClient.SNI.2.0.0\build\net46\Microsoft.Data.SqlClient.SNI.targets')" />
