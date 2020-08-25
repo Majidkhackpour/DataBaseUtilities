@@ -6,10 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Microsoft.SqlServer.Management.Smo;
 using Services;
 
-namespace BackUpDLL
+namespace DataBaseUtilities
 {
     public class DatabaseAction
     {

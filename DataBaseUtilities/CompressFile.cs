@@ -8,7 +8,7 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.GZip;
 using SharpCompress.Common;
 
-namespace BackUpDLL
+namespace DataBaseUtilities
 {
     public class CompressFile
     {

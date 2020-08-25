@@ -3,7 +3,7 @@ using System.Data;
 using System.Data.SqlClient;
 using Services;
 
-namespace BackUpDLL
+namespace DataBaseUtilities
 {
     public class DataBaseBackUpInfo
     {

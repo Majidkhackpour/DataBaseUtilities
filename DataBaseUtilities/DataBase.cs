@@ -11,7 +11,7 @@ using SharpCompress.Archives;
 using SharpCompress.Archives.GZip;
 using SharpCompress.Common;
 
-namespace BackUpDLL
+namespace DataBaseUtilities
 {
     public class DataBase
     {
@@ -25,7 +25,7 @@ namespace BackUpDLL
                 if (path == "")
                 {
                     token.ThrowIfCancellationRequested();
-                    var dlg = new SaveFileDialog { Title = @"پشتیبان گیری اطلاعات نوین پرداز" };
+                    var dlg = new SaveFileDialog { Title = @"پشتیبان گیری اطلاعات آراد" };
                     token.ThrowIfCancellationRequested();
                     var file = Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly()?.Location)
                         ?.Replace(".exe", "__");
