@@ -81,39 +81,36 @@ namespace DataBaseUtilities
                     connectionString = Txt_PathConnection.Text;
                 if (rbtnCreate.Checked)
                 {
-                    if (string.IsNullOrEmpty(connectionString))
+                    if (string.IsNullOrEmpty(Txt_DatabaseName.Text))
                     {
-                        if (string.IsNullOrEmpty(Txt_DatabaseName.Text))
+                        er.SetError(Txt_DatabaseName, "نام بانک اطلاعاتی را وارد نمایید");
+                        return;
+                    }
+
+                    var res = DataBase.CreateDatabase(Txt_DatabaseName.Text,
+                        connectionString);
+
+
+                    if (res.Result.HasError)
+                    {
+                        for (var i = 1; i < 20; i++)
                         {
-                            er.SetError(Txt_DatabaseName, "نام بانک اطلاعاتی را وارد نمایید");
-                            return;
+                            var dbName = Txt_DatabaseName.Text + i;
+                            res = DataBase.CreateDatabase(dbName, Txt_PathConnection.Text);
+                            if (res.Result.HasError) continue;
+                            Txt_DatabaseName.Text = dbName;
+                            break;
                         }
-
-                        var res = DataBase.CreateDatabase(Txt_DatabaseName.Text,
-                            connectionString);
-
 
                         if (res.Result.HasError)
                         {
-                            for (var i = 1; i < 20; i++)
-                            {
-                                var dbName = Txt_DatabaseName.Text + i;
-                                res = DataBase.CreateDatabase(dbName, Txt_PathConnection.Text);
-                                if (res.Result.HasError) continue;
-                                Txt_DatabaseName.Text = dbName;
-                                break;
-                            }
-
-                            if (res.Result.HasError)
-                            {
-                                return;
-                            }
+                            return;
                         }
-
-                        var cn = new SqlConnectionStringBuilder(connectionString)
-                            {InitialCatalog = Txt_DatabaseName.Text};
-                        connectionString = cn.ConnectionString;
                     }
+
+                    var cn = new SqlConnectionStringBuilder(connectionString)
+                    { InitialCatalog = Txt_DatabaseName.Text };
+                    connectionString = cn.ConnectionString;
                 }
 
 
