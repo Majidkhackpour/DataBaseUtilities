@@ -306,4 +306,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\Microsoft.Data.SqlClient.SNI.2.0.0\build\net46\Microsoft.Data.SqlClient.SNI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Data.SqlClient.SNI.2.0.0\build\net46\Microsoft.Data.SqlClient.SNI.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>if $(Configuration) == Release  echo F| xcopy /Y "$(TargetPath)" "D:\Projects\References\RealState\$(TargetFileName)"</PostBuildEvent>
+  </PropertyGroup>
 </Project>
