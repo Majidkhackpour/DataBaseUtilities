@@ -12,7 +12,6 @@ namespace DataBaseUtilities
 {
     public class DatabaseAction
     {
-        private static CancellationTokenSource DeleteTempFilesToken = new CancellationTokenSource();
         public static event EventHandler<CreateBackupArgs> OnCreateBackup;
 
         public static string CreateFileName(string connectionString, string directory = "")
@@ -33,17 +32,15 @@ namespace DataBaseUtilities
             return ret;
         }
 
-        public static async Task<ReturnedSaveFuncInfo> BackupDbAsync(string connectionString, ENSource Source, string path = "", Guid? Guid = null, CancellationToken token = default)
+        public static async Task<ReturnedSaveFuncInfoWithValue<string>> BackupDbAsync(string connectionString, ENSource source, string path = "")
         {
             var line = 0;
-            var res = new ReturnedSaveFuncInfo();
+            var res = new ReturnedSaveFuncInfoWithValue<string>();
             bool IsAutomatic = string.IsNullOrEmpty(path);
             string DatabaseName = "";
             try
             {
                 OnCreateBackup?.Invoke(null, new CreateBackupArgs() { Message = "", State = CreateBackupState.Start });
-                token.ThrowIfCancellationRequested();
-                DeleteTempFilesToken?.Cancel();
 
                 if (IsAutomatic) path = CreateFileName(connectionString);
                 if (!string.IsNullOrEmpty(path) && Directory.Exists(path))
@@ -53,27 +50,20 @@ namespace DataBaseUtilities
                     path = CreateFileName(connectionString, path);
                     IsAutomatic = true;
                 }
-
-                DeleteTempFilesToken?.Cancel();
-                token.ThrowIfCancellationRequested();
-
+                
                 //تهیه اولین نسخه بکاپ توسط سرویس اس کیو ال
                 var CreateSqlBackuResult = await CreateSqlServerBackupFileAsync(path, connectionString);
                 DatabaseName = CreateSqlBackuResult.value;
                 res.AddReturnedValue(CreateSqlBackuResult);
-                DeleteTempFilesToken?.Cancel();
-                token.ThrowIfCancellationRequested();
 
                 var PathForZipDirectory = Zip.Move2Temp(path);
                 res.AddReturnedValue(PathForZipDirectory);
-                DeleteTempFilesToken?.Cancel();
-                token.ThrowIfCancellationRequested();
 
                 try
                 {
                     //please dont remove this try
                     //اگر به خطا خورد باید تابع ادامه پیدا کند و پشتیبان با پسوند .بک تهیه شود
-                    res.AddReturnedValue(await CompressFile.CompressFileInstance.CompressFileAsync(PathForZipDirectory.value, path, token));
+                    res.AddReturnedValue(await CompressFile.CompressFileInstance.CompressFileAsync(PathForZipDirectory.value, path));
                 }
                 catch (Exception ex)
                 {
@@ -104,29 +94,16 @@ namespace DataBaseUtilities
             }
             finally
             {
-                DeleteTempFilesToken?.Cancel();
-                DeleteTempFilesToken = new CancellationTokenSource();
-                Task.Run(() => deleteTempsAsync(DeleteTempFilesToken.Token));
-                Task.Run(() => BackupHistory.DeleteOldBackupsAsync());
-                Task.Run(() => BackupHistory.SaveAsync(new BackupHistory()
-                {
-                    Date = DateTime.Now,
-                    Guid = Guid ?? System.Guid.NewGuid(),
-                    IsAutomatic = IsAutomatic,
-                    DatabaseName = DatabaseName,
-                    Path = path,
-                    IsSuccess = !res.HasError,
-                    Source = Source
-                }));
+                Task.Run(DeleteTempsAsync);
             }
             return res;
         }
 
-        private static async Task deleteTempsAsync(CancellationToken token)
+        private static async Task DeleteTempsAsync()
         {
             try
             {
-                await Task.Delay(60 * 1000, token);
+                await Task.Delay(60 * 1000);
                 string tempDIR = Path.Combine(Application.StartupPath, "Temp");
                 if (Directory.Exists(tempDIR))
                     Directory.Delete(tempDIR, true);
@@ -136,9 +113,9 @@ namespace DataBaseUtilities
             catch (Exception ex) { WebErrorLog.ErrorInstence.StartErrorLog(ex); }
         }
 
-        private static async Task<ReturnedSaveFuncInfo> CreateSqlServerBackupFileAsync(string path, string connectionString)
+        private static async Task<ReturnedSaveFuncInfoWithValue<string>> CreateSqlServerBackupFileAsync(string path, string connectionString)
         {
-            var ret = new ReturnedSaveFuncInfo();
+            var ret = new ReturnedSaveFuncInfoWithValue<string>();
             string commandText = "";
             try
             {
@@ -185,7 +162,7 @@ namespace DataBaseUtilities
                 if (autoBackup)
                 {
 
-                    var dir = Application.StartupPath + "\\NovinPardazBackUp";
+                    var dir = Application.StartupPath + "\\AradBackUp";
                     if (!Directory.Exists(dir))
                         Directory.CreateDirectory(dir);
 
@@ -195,7 +172,7 @@ namespace DataBaseUtilities
                     file += d;
 
                     var filepath = dir + "\\" + file + ".Bak";
-                    ret.AddReturnedValue(await BackupDbAsync(connectionString, Source, filepath, Guid.NewGuid()));
+                    ret.AddReturnedValue(await BackupDbAsync(connectionString, Source, filepath));
                 }
 
                 if (pathf.EndsWith(".NPZ") || pathf.EndsWith(".npz"))
@@ -348,7 +325,6 @@ namespace DataBaseUtilities
                 cmd.ExecuteNonQuery();
                 cn.Close();
 
-                //return cn.ConnectionString.Replace("master", DbName);
                 ret.ConnectionString = constr;
                 ret.Status = EnCreateDataBase.Success;
             }

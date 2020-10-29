@@ -63,9 +63,9 @@ namespace DataBaseUtilities
         /// </summary>
         /// <param name="FilePath"></param>
         /// <returns></returns>
-        public static ReturnedSaveFuncInfo Move2Temp(string FilePath)
+        public static ReturnedSaveFuncInfoWithValue<string> Move2Temp(string FilePath)
         {
-            var ret = new ReturnedSaveFuncInfo();
+            var ret = new ReturnedSaveFuncInfoWithValue<string>();
             try
             {
                 string tempDIR = TempDirName();

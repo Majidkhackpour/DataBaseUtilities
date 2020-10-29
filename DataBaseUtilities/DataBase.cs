@@ -16,17 +16,14 @@ namespace DataBaseUtilities
     public class DataBase
     {
         public static bool Finish_Event;
-        public static async Task<ReturnedSaveFuncInfo> BackUpStartAsync(string connectionString, ENSource Source, string path = "", Guid? Guid = null, CancellationToken token = default)
+        public static async Task<ReturnedSaveFuncInfo> BackUpStartAsync(IWin32Window owner,string connectionString, ENSource source, string path = "")
         {
             var ret = new ReturnedSaveFuncInfo();
             try
             {
-                token.ThrowIfCancellationRequested();
                 if (path == "")
                 {
-                    token.ThrowIfCancellationRequested();
                     var dlg = new SaveFileDialog { Title = @"پشتیبان گیری اطلاعات آراد" };
-                    token.ThrowIfCancellationRequested();
                     var file = Path.GetFileName(System.Reflection.Assembly.GetEntryAssembly()?.Location)
                         ?.Replace(".exe", "__");
                     var d = Calendar.MiladiToShamsi(DateTime.Now).Replace("/", "_");
@@ -34,19 +31,15 @@ namespace DataBaseUtilities
                     file += d;
                     file = file.Replace(" ", "");
                     dlg.FileName = file;
-                    token.ThrowIfCancellationRequested();
                     dlg.Filter = "*.NPZ2|*.NPZ2";
-                    token.ThrowIfCancellationRequested();
-                    token.ThrowIfCancellationRequested();
-                    if (dlg.ShowDialog() != DialogResult.OK)
+                    if (dlg.ShowDialog(owner) != DialogResult.OK)
                     {
                         ret.AddReturnedValue(ReturnedState.Warning, "لغو  توسط کاربر. عدم انتخاب آدرس ذخیره سازی.");
                         return ret;
                     }
                     path = dlg.FileName;
                 }
-                token.ThrowIfCancellationRequested();
-                ret.AddReturnedValue(await DatabaseAction.BackupDbAsync(connectionString, Source, path, Guid, token));
+                ret.AddReturnedValue(await DatabaseAction.BackupDbAsync(connectionString, source, path));
             }
             catch (ThreadAbortException ex) { ret.AddReturnedValue(ex); }
             catch (OperationCanceledException ex) { ret.AddReturnedValue(ex); }
@@ -59,7 +52,7 @@ namespace DataBaseUtilities
             return ret;
         }
 
-        public static async Task<ReturnedSaveFuncInfo> ReStoreStartAsync(string connectionString, ENSource Source, string path = "", bool autoBackup = true)
+        public static async Task<ReturnedSaveFuncInfo> ReStoreStartAsync(IWin32Window owner,string connectionString, ENSource source, string path = "", bool autoBackup = true)
         {
             var ret = new ReturnedSaveFuncInfo();
             try
@@ -73,7 +66,7 @@ namespace DataBaseUtilities
                         Title = @"فایل حاوی اطلاعات پشتیبانی نرم افزار را انتخاب نمائید"
                     };
 
-                    if (ofd.ShowDialog() != DialogResult.OK)
+                    if (ofd.ShowDialog(owner) != DialogResult.OK)
                     {
                         ret.AddReturnedValue(ReturnedState.Warning, "بازگردانی اطلاعات توسط کاربر لغو شد. عدم انتخاب آدرس ذخیره سازی فایل.");
                         return ret;
@@ -92,7 +85,7 @@ namespace DataBaseUtilities
                 }
 
                 SqlConnection.ClearAllPools();
-                ret.AddReturnedValue(await DatabaseAction.ReStoreDbAsync(connectionString, path, autoBackup, Source));
+                ret.AddReturnedValue(await DatabaseAction.ReStoreDbAsync(connectionString, path, autoBackup, source));
             }
             catch (Exception ex)
             {

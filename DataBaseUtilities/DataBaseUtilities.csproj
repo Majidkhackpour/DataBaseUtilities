@@ -243,7 +243,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BackupHistory.cs" />
     <Compile Include="CLSServerDBs.cs" />
     <Compile Include="CompressFile.cs" />
     <Compile Include="CreateBackupArgs.cs" />
@@ -278,6 +277,10 @@
     <Compile Include="Zip.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\RealState\RealState\Notification\Notification.csproj">
+      <Project>{44a0f109-df64-482c-befb-df20038ee4df}</Project>
+      <Name>Notification</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\Services\Services\Services\Services.csproj">
       <Project>{dcb5bde2-6238-422d-ad4e-f53afce9bf30}</Project>
       <Name>Services</Name>

@@ -8,7 +8,7 @@ namespace DataBaseUtilities
 {
     public partial class FRMSetSqlEngine : MetroForm
     {
-        private string _serverConnectionsString = "";
+        public string _serverConnectionsString = "";
         private SqlConnectionStringBuilder _builder = new SqlConnectionStringBuilder();
         public FRMSetSqlEngine()
         {

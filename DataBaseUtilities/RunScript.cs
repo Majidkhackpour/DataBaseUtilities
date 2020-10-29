@@ -1,14 +1,17 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using Notification;
 using Services;
 
 namespace DataBaseUtilities
 {
     public class RunScript
     {
-        public static async Task<ReturnedSaveFuncInfo> RunAsync(string Script, SqlConnection cn, SqlTransaction transaction = null, short tryCount = 2)
+        public static async Task<ReturnedSaveFuncInfo> RunAsync(IWin32Window owner,string Script, SqlConnection cn, SqlTransaction transaction = null, short tryCount = 2)
         {
             var ret = new ReturnedSaveFuncInfo();
             try
@@ -27,8 +30,19 @@ namespace DataBaseUtilities
                 if (transaction != null)
                     cmd.Transaction = transaction;
                 if (cn.State != ConnectionState.Open) cn.Open();
+
+                var frm = new frmSplash(scripts.ToList().Count);
+                frm.Show(owner);
+
+                var index = 1;
                 foreach (var item in scripts)
+                {
+                    index++;
+                    frm.Level = index;
+
                     ret.AddReturnedValue(await ExecuteAsync(item, cmd));
+                }
+                frm.Close();
             }
             catch (Exception ex)
             {
@@ -38,7 +52,7 @@ namespace DataBaseUtilities
             if (ret.HasError && tryCount > 0)
             {
                 await Task.Delay(1000);
-                return await RunAsync(Script, cn, transaction, --tryCount);
+                return await RunAsync(owner,Script, cn, transaction, --tryCount);
             }
             return ret;
         }

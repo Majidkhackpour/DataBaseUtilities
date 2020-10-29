@@ -12,7 +12,7 @@ namespace DataBaseUtilities
 {
     public class CompressFile
     {
-        public async Task<ReturnedSaveFuncInfo> CompressFileAsync(string PathForZipDirectory, string zipFilePath, CancellationToken token)
+        public async Task<ReturnedSaveFuncInfo> CompressFileAsync(string PathForZipDirectory, string zipFilePath)
         {
             var ret = new ReturnedSaveFuncInfo();
             int line = 0;
@@ -29,12 +29,10 @@ namespace DataBaseUtilities
                     line = 48;
                     archive.AddAllFromDirectory(PathForZipDirectory);
                     line = 51;
-                    token.ThrowIfCancellationRequested();
                     archive.SaveTo(zipFilePath, CompressionType.GZip);
                 }
 
                 line = 52;
-                token.ThrowIfCancellationRequested();
                 line = 53;
                 Directory.Delete(PathForZipDirectory, true);
             }
@@ -47,9 +45,9 @@ namespace DataBaseUtilities
             return ret;
         }
 
-        public async Task<ReturnedSaveFuncInfo> ExtractTempDIR(string archiveName)
+        public async Task<ReturnedSaveFuncInfoWithValue<string>> ExtractTempDIR(string archiveName)
         {
-            var ret = new ReturnedSaveFuncInfo();
+            var ret = new ReturnedSaveFuncInfoWithValue<string>();
             try
             {
                 var pathtemp = Zip.TempDirName();
