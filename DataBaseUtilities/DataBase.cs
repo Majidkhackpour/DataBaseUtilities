@@ -16,7 +16,7 @@ namespace DataBaseUtilities
     public class DataBase
     {
         public static bool Finish_Event;
-        public static async Task<ReturnedSaveFuncInfo> BackUpStartAsync(IWin32Window owner,string connectionString, ENSource source, string path = "")
+        public static async Task<ReturnedSaveFuncInfo> BackUpStartAsync(IWin32Window owner, string connectionString, ENSource source, EnBackUpType type, string path = "")
         {
             var ret = new ReturnedSaveFuncInfo();
             try
@@ -39,7 +39,7 @@ namespace DataBaseUtilities
                     }
                     path = dlg.FileName;
                 }
-                ret.AddReturnedValue(await DatabaseAction.BackupDbAsync(connectionString, source, path));
+                ret.AddReturnedValue(await DatabaseAction.BackupDbAsync(connectionString, source, type, path));
             }
             catch (ThreadAbortException ex) { ret.AddReturnedValue(ex); }
             catch (OperationCanceledException ex) { ret.AddReturnedValue(ex); }
@@ -52,7 +52,7 @@ namespace DataBaseUtilities
             return ret;
         }
 
-        public static async Task<ReturnedSaveFuncInfo> ReStoreStartAsync(IWin32Window owner,string connectionString, ENSource source, string path = "", bool autoBackup = true)
+        public static async Task<ReturnedSaveFuncInfo> ReStoreStartAsync(IWin32Window owner, string connectionString, ENSource source, string path = "", bool autoBackup = true)
         {
             var ret = new ReturnedSaveFuncInfo();
             try

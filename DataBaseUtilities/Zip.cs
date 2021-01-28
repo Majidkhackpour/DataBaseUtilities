@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
+using System.Threading.Tasks;
 using Services;
 using SevenZip;
 
@@ -61,26 +62,30 @@ namespace DataBaseUtilities
         /// <summary>
         /// ورودی آدرس فایل خروجی آدرس پوشه ای که باید فشرده سازی شود
         /// </summary>
-        /// <param name="FilePath"></param>
+        /// <param name="filePath"></param>
         /// <returns></returns>
-        public static ReturnedSaveFuncInfoWithValue<string> Move2Temp(string FilePath)
+        public static async  Task<ReturnedSaveFuncInfoWithValue<string>> Move2Temp(string filePath,Guid guid,EnBackUpType type)
         {
             var ret = new ReturnedSaveFuncInfoWithValue<string>();
             try
             {
                 string tempDIR = TempDirName();
-                FileInfo tempInfor = new FileInfo(FilePath);
-                if (!File.Exists(FilePath))
+                FileInfo tempInfor = new FileInfo(filePath);
+                if (!File.Exists(filePath))
                 {
-                    ret.AddReturnedValue(ReturnedState.Error, $"path not exists : {FilePath}");
+                    var msg = $"path not exists : {filePath}";
+                    await DatabaseAction.BackUpLogAsync(guid, type, EnBackUpStatus.Error, filePath, msg);
+                    ret.AddReturnedValue(ReturnedState.Error, msg);
                     return ret;
                 }
                 var retFilePath = Path.Combine(tempDIR, tempInfor.Name);
-                File.Move(FilePath, retFilePath);
+                File.Move(filePath, retFilePath);
                 ret.value = tempDIR;
+                await DatabaseAction.BackUpLogAsync(guid, type, EnBackUpStatus.Success, filePath, "انتقال فایل به پوشه Temp انجام شد");
             }
             catch (Exception ex)
             {
+                await DatabaseAction.BackUpLogAsync(guid, type, EnBackUpStatus.Error, filePath, ex.Message);
                 WebErrorLog.ErrorInstence.StartErrorLog(ex);
                 ret.AddReturnedValue(ex);
             }

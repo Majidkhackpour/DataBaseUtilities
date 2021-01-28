@@ -12,7 +12,7 @@ namespace DataBaseUtilities
 {
     public class CompressFile
     {
-        public async Task<ReturnedSaveFuncInfo> CompressFileAsync(string PathForZipDirectory, string zipFilePath)
+        public async Task<ReturnedSaveFuncInfo> CompressFileAsync(string pathForZipDirectory, string zipFilePath,Guid guid,EnBackUpType type)
         {
             var ret = new ReturnedSaveFuncInfo();
             int line = 0;
@@ -27,18 +27,22 @@ namespace DataBaseUtilities
                 using (var archive = ArchiveFactory.Create(ArchiveType.GZip))
                 {
                     line = 48;
-                    archive.AddAllFromDirectory(PathForZipDirectory);
+                    archive.AddAllFromDirectory(pathForZipDirectory);
                     line = 51;
                     archive.SaveTo(zipFilePath, CompressionType.GZip);
                 }
 
                 line = 52;
                 line = 53;
-                Directory.Delete(PathForZipDirectory, true);
+                Directory.Delete(pathForZipDirectory, true);
+                await DatabaseAction.BackUpLogAsync(guid, type, EnBackUpStatus.Success, zipFilePath,
+                    "فایل فشره شده ایجاد شد");
             }
             catch (OperationCanceledException ex) { ret.AddReturnedValue(ex); }
             catch (Exception ex)
             {
+                await DatabaseAction.BackUpLogAsync(guid, type, EnBackUpStatus.Error, zipFilePath,
+                    ex.Message);
                 WebErrorLog.ErrorInstence.StartErrorLog(ex, $"Line:{line}");
                 ret.AddReturnedValue(ex);
             }

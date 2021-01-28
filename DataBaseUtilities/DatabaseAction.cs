@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using EntityCache.Bussines;
 using Services;
 
 namespace DataBaseUtilities
@@ -13,6 +14,49 @@ namespace DataBaseUtilities
     public class DatabaseAction
     {
         public static event EventHandler<CreateBackupArgs> OnCreateBackup;
+
+        public static async Task<ReturnedSaveFuncInfo> BackUpLogAsync(Guid guid, EnBackUpType type, EnBackUpStatus status, string path, string desc)
+        {
+            var res = new ReturnedSaveFuncInfo();
+            try
+            {
+                var fi = new FileInfo(path);
+                var size = (long)0;
+                try
+                {
+                    if (File.Exists(path))
+                    {
+                        size = fi.Length;
+                        size /= 1000000;
+                    }
+                }
+                catch { }
+
+
+                var log = await BackUpLogBussines.GetAsync(guid) ?? new BackUpLogBussines()
+                {
+                    Guid = guid,
+                    Modified = DateTime.Now,
+                    Status = true,
+                    InsertedDate = DateTime.Now
+                };
+
+                log.BackUpStatus = status;
+                log.Path = path;
+                log.Type = type;
+                log.StatusDesc = desc;
+                log.Size = (short)size;
+
+                await log.SaveAsync();
+            }
+            catch (Exception ex)
+            {
+                WebErrorLog.ErrorInstence.StartErrorLog(ex);
+                res.AddReturnedValue(ex);
+            }
+
+            return res;
+        }
 
         public static string CreateFileName(string connectionString, string directory = "")
         {
@@ -32,14 +76,16 @@ namespace DataBaseUtilities
             return ret;
         }
 
-        public static async Task<ReturnedSaveFuncInfoWithValue<string>> BackupDbAsync(string connectionString, ENSource source, string path = "")
+        public static async Task<ReturnedSaveFuncInfoWithValue<string>> BackupDbAsync(string connectionString, ENSource source, EnBackUpType type, string path = "")
         {
             var line = 0;
             var res = new ReturnedSaveFuncInfoWithValue<string>();
             bool IsAutomatic = string.IsNullOrEmpty(path);
             string DatabaseName = "";
+            var guid = Guid.NewGuid();
             try
             {
+
                 OnCreateBackup?.Invoke(null, new CreateBackupArgs() { Message = "", State = CreateBackupState.Start });
 
                 if (IsAutomatic) path = CreateFileName(connectionString);
@@ -50,20 +96,25 @@ namespace DataBaseUtilities
                     path = CreateFileName(connectionString, path);
                     IsAutomatic = true;
                 }
-                
+
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Pending, path,
+                    "آغاز فرآیند تهیه فایل پشتیبان");
+
                 //تهیه اولین نسخه بکاپ توسط سرویس اس کیو ال
-                var CreateSqlBackuResult = await CreateSqlServerBackupFileAsync(path, connectionString);
+                var CreateSqlBackuResult = await CreateSqlServerBackupFileAsync(path, connectionString, guid, type);
                 DatabaseName = CreateSqlBackuResult.value;
                 res.AddReturnedValue(CreateSqlBackuResult);
 
-                var PathForZipDirectory = Zip.Move2Temp(path);
+                var PathForZipDirectory = await Zip.Move2Temp(path, guid, type);
                 res.AddReturnedValue(PathForZipDirectory);
 
                 try
                 {
                     //please dont remove this try
                     //اگر به خطا خورد باید تابع ادامه پیدا کند و پشتیبان با پسوند .بک تهیه شود
-                    res.AddReturnedValue(await CompressFile.CompressFileInstance.CompressFileAsync(PathForZipDirectory.value, path));
+                    res.AddReturnedValue(
+                        await CompressFile.CompressFileInstance.CompressFileAsync(PathForZipDirectory.value, path, guid,
+                            type));
                 }
                 catch (Exception ex)
                 {
@@ -82,6 +133,9 @@ namespace DataBaseUtilities
 
                 OnCreateBackup?.Invoke(null,
                            new CreateBackupArgs() { Message = "", State = CreateBackupState.End });
+
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Success, path.ToLower(),
+                    "عملیات پشتیبان گیری با موفقیت انجام شد");
             }
             catch (OperationCanceledException ex)
             {
@@ -89,6 +143,8 @@ namespace DataBaseUtilities
             }
             catch (Exception ex)
             {
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Error, path.ToLower().Replace(".npz2", ".np").Replace(".npz", ".np"),
+                    ex.Message);
                 WebErrorLog.ErrorInstence.StartErrorLog(ex, $"Error in Line {line}");
                 res.AddReturnedValue(ex);
             }
@@ -113,7 +169,7 @@ namespace DataBaseUtilities
             catch (Exception ex) { WebErrorLog.ErrorInstence.StartErrorLog(ex); }
         }
 
-        private static async Task<ReturnedSaveFuncInfoWithValue<string>> CreateSqlServerBackupFileAsync(string path, string connectionString)
+        private static async Task<ReturnedSaveFuncInfoWithValue<string>> CreateSqlServerBackupFileAsync(string path, string connectionString, Guid guid, EnBackUpType type)
         {
             var ret = new ReturnedSaveFuncInfoWithValue<string>();
             string commandText = "";
@@ -122,7 +178,9 @@ namespace DataBaseUtilities
                 var inf = new FileInfo(path);
                 if (string.IsNullOrEmpty(path) || string.IsNullOrEmpty(inf.Name) || !Directory.Exists(inf.DirectoryName))
                 {
-                    ret.AddReturnedValue(ReturnedState.Error, $"آدرس {path} موجود یا معتبر نیست.");
+                    var msg = $"آدرس {path} موجود یا معتبر نیست.";
+                    await BackUpLogAsync(guid, type, EnBackUpStatus.Error, path, msg);
+                    ret.AddReturnedValue(ReturnedState.Error, msg);
                     return ret;
                 }
                 var cn = new SqlConnection(connectionString);
@@ -135,15 +193,19 @@ namespace DataBaseUtilities
                 await cn.OpenAsync();
                 await cmd.ExecuteNonQueryAsync();
                 cn.Close();
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Success, path, "پشتیبان اولیه با پسوند .bak تهیه شد");
                 commandText = "";
             }
             catch (SqlException ex)
             {
+                var msg = $"خطا در تهیه نسخه پشتیبان اطلاعات \r\nحساب کاربری SQL دسترسی به مسیر نصب برنامه ندارد\r\n{ex.Message}//{ex?.InnerException?.Message ?? ""}";
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Error, path, msg);
                 WebErrorLog.ErrorInstence.StartErrorLog(ex);
-                ret.AddReturnedValue(ReturnedState.Error, $"خطا در تهیه نسخه پشتیبان اطلاعات \r\nحساب کاربری SQL دسترسی به مسیر نصب برنامه ندارد\r\n{ex.Message}//{ex?.InnerException?.Message ?? ""}");
+                ret.AddReturnedValue(ReturnedState.Error, msg);
             }
             catch (Exception ex)
             {
+                await BackUpLogAsync(guid, type, EnBackUpStatus.Error, path, ex.Message);
                 WebErrorLog.ErrorInstence.StartErrorLog(ex);
                 ret.AddReturnedValue(ex);
             }
@@ -172,7 +234,7 @@ namespace DataBaseUtilities
                     file += d;
 
                     var filepath = dir + "\\" + file + ".Bak";
-                    ret.AddReturnedValue(await BackupDbAsync(connectionString, Source, filepath));
+                    ret.AddReturnedValue(await BackupDbAsync(connectionString, Source, EnBackUpType.Manual, filepath));
                 }
 
                 if (pathf.EndsWith(".NPZ") || pathf.EndsWith(".npz"))

@@ -277,6 +277,10 @@
     <Compile Include="Zip.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\RealState\RealState\EntityCache\EntityCache.csproj">
+      <Project>{cc417799-f38c-4997-8491-510eb1c15f74}</Project>
+      <Name>EntityCache</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\..\RealState\RealState\Notification\Notification.csproj">
       <Project>{44a0f109-df64-482c-befb-df20038ee4df}</Project>
       <Name>Notification</Name>
